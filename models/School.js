@@ -10,6 +10,9 @@ const schoolSchema = new Schema(
       type: String,
       required: true,
     },
+    generalInfo: {
+      type: String,
+    },
     primaryContactName: {
       type: String,
       required: true,
@@ -64,12 +67,18 @@ const schoolSchema = new Schema(
     },
     educationalMethod: {
       type: String,
-      enum: ["Montesori", "Progressive", "Traditional", "Other"],
+      enum: ["Montessori", "Progressive", "Traditional", "Other"],
       required: true,
     },
-    educationLevel: {
-      type: String,
+    educationLevelMin: {
+      type: Number,
       required: true,
+      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    },
+    educationLevelMax: {
+      type: Number,
+      required: true,
+      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     },
     primaryEducationalLanguage: {
       type: String,
@@ -111,7 +120,6 @@ const schoolSchema = new Schema(
         "Hebrew",
         "Greek",
       ],
-      required: true,
     },
     tuition: {
       type: Number,
