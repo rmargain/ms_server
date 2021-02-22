@@ -145,3 +145,16 @@ exports.deleteSchool = async (req, res) => {
     res.status(400).json({message: "School does not exist within your Schools Catalogue"})
   }
 };
+
+exports.getStudentsBySchool = async (req, res, next) => {
+  const {schoolId} = req.params
+  const {_id} = req.user
+  const user = await User.findById(_id)
+  if(user.schools.includes(schoolId)){
+  const school = await (await School.findById(schoolId)).populate("_students")
+  const {_students} = school
+  res.status(201).json({_students})
+  } else {
+  res.status(401).json({message: 'Unathorized'})
+  }
+}

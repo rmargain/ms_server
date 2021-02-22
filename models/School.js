@@ -125,6 +125,12 @@ const schoolSchema = new Schema(
       type: Number,
       required: true,
     },
+    _students: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Student"
+      }
+    ]
   },
   {
     timestamps: {

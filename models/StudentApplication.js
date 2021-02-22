@@ -1,6 +1,6 @@
 const {Schema, model} = require("mongoose");
 
-const schoolSchema = new Schema(
+const studentApplicationSchema = new Schema(
   {
     _user: {
       type: Schema.Types.ObjectId,
@@ -14,9 +14,16 @@ const schoolSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Student",
     },
+    _messages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Messages"
+      }
+    ],
     admitted: {
-      type: Boolean,
-      default: false,
+      type: String,
+      default: 'Under Review',
+      enum: ['Approved', 'Under Review', 'Not Approved']
     },
     enrolled: {
       type: Boolean,
@@ -35,5 +42,5 @@ const schoolSchema = new Schema(
   }
 );
 
-const School = model("School", schoolSchema);
-module.exports = School;
+const StudentApplication = model("StudentApplication", studentApplicationSchema);
+module.exports = StudentApplication;

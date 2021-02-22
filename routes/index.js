@@ -8,76 +8,61 @@ const {
   getAllFilteredSchools,
   getSchool,
   deleteSchool,
-  getSchoolsByUser
+  getSchoolsByUser,
+  getStudentsBySchool,
 } = require("../controllers/school.controllers");
-// const {
-//   getAllCosos,
-//   getCosoById,
-//   createCoso,
-//   updateCoso,
-//   deleteCoso,
-// } = require("../controllers/coso");
-// const {
-//   getColsByUser,
-//   getOneCol,
-//   createCol,
-//   updateCol,
-//   addResourceToCol,
-//   deleteResourceFromCol,
-//   deleteCol,
-// } = require("../controllers/collection");
-// const {
-//   createPreference,
-//   createOrder,
-//   userOrders,
-// } = require("../controllers/order");
+const {
+  getAllStudents,
+  createStudent,
+  getStudentById,
+  updateStudent,
+  deleteStudent,
+} = require("../controllers/student.controllers");
+const {
+  createStudentApplication,
+  getAllStudentApplications,
+  getStudentApplicaitonsBySchool,
+  getStudentApplicaitonsByStudent,
+  getStudentApplicaitonById,
+  cancelApplication,
+  approveApplication,
+} = require("../controllers/studentApplication.controllers");
 
 /* GET home page */
 router.get("/", (req, res, next) => {
   res.send("MS API");
 });
 
-// // ============School============
-// // verificamos que exista el user
-// //                               👇
+// // ============School============                             👇
 router.post("/school/create", isAuth, catchErrors(createSchool));
 router.patch("/school/update/:schoolId", isAuth, catchErrors(updateSchoolInfo));
 router.get("/school/all", catchErrors(getAllSchools));
 router.get("/school", catchErrors(getSchoolsByUser));
 router.get("/school/search", catchErrors(getAllFilteredSchools));
 router.get("/school/:schoolId", catchErrors(getSchool));
-router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool))
-// The main difference between the PUT and PATCH method is that the PUT method uses the request URI to supply a modified version of the requested resource which replaces the original version of the resource, whereas the PATCH method supplies a set of instructions to modify the resource.
-// router.patch("/school/:artistId/like", isAuth, catchErrors(updateLikes));
-// router.patch("/school/:artistId/rating", isAuth, catchErrors(updateRating));
-// // Mostrar todos los artistas
-// router.get("/school/all", catchErrors(getAllArtists));
-// //Mostrar un artista (por su id)
-// router.get("/school/:artistId", catchErrors(getArtistsById));
+router.get(
+  "/school/:schoolId/strudents",
+  isAuth,
+  catchErrors(getStudentsBySchool)
+);
+router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
 
-// //===========Cosos===========
-// router.get("/coso", catchErrors(getAllCosos));
-// router.post("/coso", isAuth, isArtists, catchErrors(createCoso));
-// router.get("/coso/:cosoId", catchErrors(getCosoById));
-// router.patch("/coso/:cosoId", catchErrors(updateCoso));
-// router.delete("/coso/:cosoId", catchErrors(deleteCoso));
+// // ===========Student===========
+router.get("/student", catchErrors(getAllStudents));
+router.post("/student", isAuth, catchErrors(createStudent));
+router.get("/student/:studentId", catchErrors(getStudentById));
+router.patch("/student/:studentId", isAuth, catchErrors(updateStudent));
+router.delete("/student/:studentId", isAuth, catchErrors(deleteStudent));
 
-// //===========Collections===========
-// router.get("/col", isAuth, catchErrors(getColsByUser));
-// router.get("/col/:colId", catchErrors(getOneCol));
-// router.post("/col", isAuth, catchErrors(createCol));
-// router.patch("/col/:colId", catchErrors(updateCol));
-// router.patch("/col/:colId/:cosoId", catchErrors(addResourceToCol));
-// router.delete("/col/:colId/:cosoId", catchErrors(deleteResourceFromCol));
-// router.delete("/col/:colId", catchErrors(deleteCol));
+// //===========Student Applications===========
+router.post("/application/:schoolId", isAuth, catchErrors(createStudentApplication))
+router.get("/application", isAuth, catchErrors(getAllStudentApplications))
+router.get("/application/:applicationId", isAuth, catchErrors(getStudentApplicaitonById));
+router.get("/application/school/:schoolId", isAuth, catchErrors(getStudentApplicaitonsBySchool))
+router.get("/application/student/:studentId", isAuth, catchErrors(getStudentApplicaitonsByStudent))
+router.patch("/application/approve/:applicationlId", isAuth, catchErrors(approveApplication))
+router.patch("/application/cancel/:applicationlId", isAuth, catchErrors(cancelApplication))
+// //===========Messages=========== TODO: Terminar Mensajes.
 
-// //===========Orders=========== TODO: Terminar ordenes con MP.
-
-// router.post("/preference", catchErrors(createPreference))
-// router.post("/order", isAuth, catchErrors(createOrder))
-// router.get("/order", isAuth, catchErrors(userOrders))
-// // Generar la preferencia con mercadopago de nuestro carrito
-// // uyetrqi8w47
-// // Generar la orden (ya pagado)
 
 module.exports = router;

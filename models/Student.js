@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const schoolSchema = new Schema(
+const studentSchema = new Schema(
   {
     _user: {
       type: Schema.Types.ObjectId,
@@ -21,6 +21,10 @@ const schoolSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "StudentApplications",
     },
+    _enrollments: {
+      type: Schema.Types.ObjectId,
+      ref: "StudentApplicaitons",
+    },
   },
   {
     timestamps: {
@@ -30,5 +34,5 @@ const schoolSchema = new Schema(
   }
 );
 
-const School = model("School", schoolSchema);
-module.exports = School;
+const Student = model("Student", studentSchema);
+module.exports = Student;
