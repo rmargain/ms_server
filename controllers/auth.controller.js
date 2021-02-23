@@ -127,11 +127,10 @@ exports.changeAvatar = async (req, res) => {
 
 exports.confirmationProcess = async (req, res) => {
   const { confirmationCode } = req.params;
-  User.findOneAndUpdate(
+  await User.findOneAndUpdate(
     { confirmationCode: confirmationCode },
     { status: "Active" },
     { new: true }
   )
-    .then(() => res.status(200).json({ message: "activation success" }))
-    .catch((err) => res.status(400).json({ message: "something went wrong" }));
+  res.status(200).json({ message: "activation success" })
 };

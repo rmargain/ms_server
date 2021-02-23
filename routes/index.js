@@ -27,6 +27,7 @@ const {
   cancelApplication,
   approveApplication,
 } = require("../controllers/studentApplication.controllers");
+const { createMessage, markAsRead, deleteMessage } = require("../controllers/message.controllers");
 
 /* GET home page */
 router.get("/", (req, res, next) => {
@@ -40,16 +41,12 @@ router.get("/school/all", catchErrors(getAllSchools));
 router.get("/school", catchErrors(getSchoolsByUser));
 router.get("/school/search", catchErrors(getAllFilteredSchools));
 router.get("/school/:schoolId", catchErrors(getSchool));
-router.get(
-  "/school/:schoolId/strudents",
-  isAuth,
-  catchErrors(getStudentsBySchool)
-);
+router.get("/school/:schoolId/students", isAuth,catchErrors(getStudentsBySchool));
 router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
 
 // // ===========Student===========
 router.get("/student", catchErrors(getAllStudents));
-router.post("/student", isAuth, catchErrors(createStudent));
+router.post("/student/create", isAuth, catchErrors(createStudent));
 router.get("/student/:studentId", catchErrors(getStudentById));
 router.patch("/student/:studentId", isAuth, catchErrors(updateStudent));
 router.delete("/student/:studentId", isAuth, catchErrors(deleteStudent));
@@ -60,9 +57,16 @@ router.get("/application", isAuth, catchErrors(getAllStudentApplications))
 router.get("/application/:applicationId", isAuth, catchErrors(getStudentApplicaitonById));
 router.get("/application/school/:schoolId", isAuth, catchErrors(getStudentApplicaitonsBySchool))
 router.get("/application/student/:studentId", isAuth, catchErrors(getStudentApplicaitonsByStudent))
-router.patch("/application/approve/:applicationlId", isAuth, catchErrors(approveApplication))
-router.patch("/application/cancel/:applicationlId", isAuth, catchErrors(cancelApplication))
+router.patch("/application/approve/:applicationId", isAuth, catchErrors(approveApplication));
+router.patch("/application/cancel/:applicationId", isAuth, catchErrors(cancelApplication))
 // //===========Messages=========== TODO: Terminar Mensajes.
+
+router.post("/message/create/:applicationId", isAuth, catchErrors(createMessage))
+router.patch("/message/read/:messageId", isAuth, catchErrors(markAsRead))
+router.delete("/message/delete/:messageId", isAuth, catchErrors(deleteMessage))
+// get by school
+// get by applicant
+// get by application
 
 
 module.exports = router;

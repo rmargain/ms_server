@@ -9,7 +9,9 @@ exports.createSchool = async (req, res, next) => {
     primaryContactName,
     primaryContactEmail,
     primaryContactPhone,
-    address,
+    address, /*cambiar por individuales*/
+    lat,
+    lng,
     capacity,
     educationalMethod,
     educationLevelMin,
@@ -19,7 +21,10 @@ exports.createSchool = async (req, res, next) => {
     tuition,
   } = req.body;
   const { _id } = req.user;
-
+  const location = {
+    type: 'Point',
+    coordinates: [lng, lat]
+  }
   const user = await User.findById(_id);
   const school = await School.create({
     _user: user._id,
@@ -29,6 +34,7 @@ exports.createSchool = async (req, res, next) => {
     primaryContactEmail,
     primaryContactPhone,
     address,
+    location,
     capacity,
     educationalMethod,
     educationLevelMin,
@@ -40,7 +46,6 @@ exports.createSchool = async (req, res, next) => {
 
   user.isSchool = true;
   user._schools.push(school._id);
-
   await user.save();
 
   res.status(201).json({school, user});
@@ -57,6 +62,8 @@ exports.updateSchoolInfo = async (req, res, next) => {
     primaryContactEmail,
     primaryContactPhone,
     address,
+    lat,
+    lng,
     capacity,
     educationalMethod,
     educationLevelMin,
@@ -65,6 +72,10 @@ exports.updateSchoolInfo = async (req, res, next) => {
     secondaryEducationalLanguage,
     tuition,
   } = req.body;
+  const location = {
+    type: "Point",
+    coordinates: [lng, lat],
+  };
   const user = await User.findById(_id);
   if (user._schools.includes(schoolId)) {
     const school = await School.findByIdAndUpdate(
@@ -76,6 +87,7 @@ exports.updateSchoolInfo = async (req, res, next) => {
         primaryContactEmail,
         primaryContactPhone,
         address,
+        location,
         capacity,
         educationalMethod,
         educationLevelMin,
@@ -157,4 +169,12 @@ exports.getStudentsBySchool = async (req, res, next) => {
   } else {
   res.status(401).json({message: 'Unathorized'})
   }
+}
+
+exports.getAllLocations = async (req, res) => {
+
+}
+
+exports.getOneLocation = async (req, res) => {
+  
 }

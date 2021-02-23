@@ -8,18 +8,18 @@ const {
   changeAvatar,
   confirmationProcess,
 } = require("../controllers/auth.controller");
-const { isAuth } = require("../middlewares");
+const { isAuth, catchErrors } = require("../middlewares");
 
 router.post("/login", loginProcess);
 
 router.post("/signup", signupProcess);
 
-router.post("/confirm/:confirmationCode", confirmationProcess);
+router.post("/confirm/:confirmationCode", catchErrors(confirmationProcess));
 
 router.get("/logout", logoutProcess);
 
 router.get("/session", checkSession);
 
-router.post("/avatar/change", isAuth, changeAvatar);
+router.post("/avatar/change", isAuth, catchErrors(changeAvatar));
 
 module.exports = router;

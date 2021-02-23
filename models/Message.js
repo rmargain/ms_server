@@ -8,11 +8,9 @@ const messageSchema = new Schema(
     },
     to: {
         type: String,
-        enum: ["Applicant", "School"]
     },
     from: {
         type: String,
-        enum: ["Applicant", "School"]
     },
     text: {
       type: String,

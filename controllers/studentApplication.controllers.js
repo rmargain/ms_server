@@ -2,7 +2,7 @@ const User = require("../models/User");
 const School = require("../models/School");
 const Student = require("../models/Student");
 const StudentApplication = require("../models/StudentApplication");
-const Message = require("../models/Message")
+const Message = require("../models/Message");
 const nodemailer = require("nodemailer");
 let transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -16,37 +16,39 @@ let transporter = nodemailer.createTransport({
 exports.createStudentApplication = async (req, res, next) => {
   const { _id } = req.user;
   const { alias, message } = req.body;
-  const {schoolId} = req.params;
+  const { schoolId } = req.params;
 
   const user = await User.findById(_id);
-  const student = await Student.find({alias: alias, _user: _id})
+  const student = await Student.findOne({ alias: alias, _user: _id });
   const application = await StudentApplication.create({
     _user: _id,
     _school: schoolId,
-    _student: student._id,
+    _student: student._id
   });
-  
+  const school = await School.findById(schoolId);
   const msg = await Message.create({
     _user: _id,
-    to: 'School',
-    from: 'Applicant',
+    to: application._school,
+    from: application._user,
     text: message,
-    _application: application._id
-  })
+    _application: application._id,
+  });
+  application._messages.push(msg._id)
+  await application.save()
   user._applications.push(application._id);
-  user._messages.push(msg._id)
-  user.save();
-  const school = await School.findById(schoolId)
-  const {name, primaryContactEmail} = school
+  user._messages.push(msg._id);
+  await user.save();
+  school._messages.push(msg._id);
+  await school.save();
   await transporter.sendMail({
     from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
-    to: primaryContactEmail,
+    to: school.primaryContactEmail,
     subject: "MicroSchooling: You have Received a student application!",
-    html: `<b>Log in to your MS account to review the student application for ${name}. </b>
-    <b>Applicant Message: ${messsage}</b>`,
+    html: `<b>Log in to your MS account to review the student application for ${school.name}. </b>
+    <b>Applicant Message: ${message}</b>`,
   });
 
-  res.status(201).json(application, user, msg);
+  res.status(201).json({application, user, msg});
 };
 
 // controller for getting all applications
@@ -58,21 +60,21 @@ exports.getAllStudentApplications = async (req, res, next) => {
 //controller for getting applications by applicationID
 exports.getStudentApplicaitonById = async (req, res, next) => {
   const { applicationId } = req.params;
-  const application = await StudentApplication.findbyID(applicationId);
+  const application = await StudentApplication.findById(applicationId);
   res.status(201).json(application);
 };
 
 //controller for getting applications by studentID
 exports.getStudentApplicaitonsByStudent = async (req, res, next) => {
   const { studentId } = req.params;
-  const applications = await StudentApplication.find({_student: studentId});
+  const applications = await StudentApplication.find({ _student: studentId });
   res.status(201).json(applications);
 };
 
 //controller for getting applications by school by ID
 exports.getStudentApplicaitonsBySchool = async (req, res, next) => {
   const { schoolId } = req.params;
-  const applications = await StudentApplication.find({_school: schoolId});
+  const applications = await StudentApplication.find({ _school: schoolId });
   res.status(201).json(applications);
 };
 
@@ -80,18 +82,27 @@ exports.getStudentApplicaitonsBySchool = async (req, res, next) => {
 exports.cancelApplication = async (req, res, next) => {
   const { applicationId } = req.params;
   const { _id } = req.user;
-  const {message} = req.body;
+  const { message } = req.body;
   const user = await User.findById(_id);
+  console.log(user._applications.includes(applicationId))
   if (user._applications.includes(applicationId)) {
-    const application = await StudentApplicaiton.findByIdAndUpdate(
-      applicationId,
-      {
-        isCancelled: true
-      },
-      { new: true }
-    );
-    const school = await School.findById(applicaiton._school)
-    const {primaryContactEmail} = school
+    const application = await StudentApplication.findById(applicationId);
+    const school = await School.findById(application._school);
+    const msg = await Message.create({
+      _user: _id,
+      to: application._school,
+      from: application._user,
+      text: message,
+      _application: application._id,
+    });
+    application.isCancelled = true,
+    application._messages.push(msg._id)
+    await application.save()
+    school._messages.push(msg._id);
+    await school.save();
+    user._messages.push(msg._id);
+    await user.save()
+    const { primaryContactEmail, name } = school;
     await transporter.sendMail({
       from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
       to: primaryContactEmail,
@@ -109,17 +120,34 @@ exports.cancelApplication = async (req, res, next) => {
 exports.approveApplication = async (req, res, next) => {
   const { applicationId } = req.params;
   const { _id } = req.user;
-  const {message, decision} = req.body;
-  const application = await StudentApplication.findById(applicationId)
+  const { message, decision } = req.body;
+  const application = await StudentApplication.findById(applicationId);
+  console.log(application)
   const user = await User.findById(_id);
+  console.log(user._schools)
   if (user._schools.includes(application._school)) {
-    application.admitted = decision
-    application.save()
-    const school = await School.findById(application._school)
-    const {name} = school
+    application.admitted = decision;
+    await application.save();
+    const school = await School.findById(application._school);
+    const msg = await Message.create({
+      _user: _id,
+      to: application._user,
+      from: application._school,
+      text: message,
+      _application: application._id,
+    });
+    user._messages.push(msg._id);
+    await user.save();
+    school._messages.push(msg._id);
+    await school.save();
+    const { name } = school;
+    const applicationUser = await User.findById(application._user)
+    const {email} = applicationUser
+    applicationUser._messages.push(msg._id)
+    await applicationUser.save()
     await transporter.sendMail({
       from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
-      to: user.email,
+      to: email,
       subject: `MicroSchooling: Decision on you Application to ${name}`,
       html: `<b>Your application has been ${decision}. Log in to your MS account to review your application to ${name}. </b>
     <b>School Message: ${message}</b>`,

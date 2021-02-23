@@ -61,6 +61,10 @@ const schoolSchema = new Schema(
         minLength: 5,
       },
     },
+    location: { /* GeoJson */
+      type: {type: String},
+      coordinates: [Number]
+    },
     capacity: {
       type: Number,
       required: true,
@@ -72,13 +76,11 @@ const schoolSchema = new Schema(
     },
     educationLevelMin: {
       type: Number,
-      required: true,
-      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     },
     educationLevelMax: {
       type: Number,
-      required: true,
-      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     },
     primaryEducationalLanguage: {
       type: String,
@@ -130,6 +132,12 @@ const schoolSchema = new Schema(
         type: Schema.Types.ObjectId,
         ref: "Student"
       }
+    ], 
+    _messages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message"
+      }
     ]
   },
   {
@@ -140,5 +148,6 @@ const schoolSchema = new Schema(
   }
 );
 
-const School = model("School", schoolSchema);
-module.exports = School;
+schoolSchema.index({location: "2dsphere"})
+
+module.exports = model("School", schoolSchema);

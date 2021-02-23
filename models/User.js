@@ -48,7 +48,13 @@ const userSchema = new Schema({
   _applications: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Enrollments"
+      ref: "StudentApplication"
+    }
+  ], 
+  _messages: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Message"
     }
   ]
 }, 
