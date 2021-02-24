@@ -28,6 +28,8 @@ exports.createStudentApplication = async (req, res, next) => {
   const school = await School.findById(schoolId);
   const msg = await Message.create({
     _user: _id,
+    onToModel: 'School', 
+    onFromModel: 'User',
     to: application._school,
     from: application._user,
     text: message,
@@ -67,7 +69,7 @@ exports.getStudentApplicaitonById = async (req, res, next) => {
 //controller for getting applications by studentID
 exports.getStudentApplicaitonsByStudent = async (req, res, next) => {
   const { studentId } = req.params;
-  const applications = await StudentApplication.find({ _student: studentId });
+  const applications = await StudentApplication.find({ _student: studentId }).populate('_user').populate('_school').populate('_student');
   res.status(201).json(applications);
 };
 
@@ -90,6 +92,8 @@ exports.cancelApplication = async (req, res, next) => {
     const school = await School.findById(application._school);
     const msg = await Message.create({
       _user: _id,
+      onToModel: "School",
+      onFromModel: "User",
       to: application._school,
       from: application._user,
       text: message,
@@ -122,15 +126,15 @@ exports.approveApplication = async (req, res, next) => {
   const { _id } = req.user;
   const { message, decision } = req.body;
   const application = await StudentApplication.findById(applicationId);
-  console.log(application)
   const user = await User.findById(_id);
-  console.log(user._schools)
   if (user._schools.includes(application._school)) {
     application.admitted = decision;
     await application.save();
     const school = await School.findById(application._school);
     const msg = await Message.create({
       _user: _id,
+      onToModel: "User",
+      onFromModel: "School",
       to: application._user,
       from: application._school,
       text: message,

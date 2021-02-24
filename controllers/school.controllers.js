@@ -55,47 +55,12 @@ exports.createSchool = async (req, res, next) => {
 exports.updateSchoolInfo = async (req, res, next) => {
   const { _id } = req.user;
   const { schoolId } = req.params;
-  const {
-    name,
-    generalInfo,
-    primaryContactName,
-    primaryContactEmail,
-    primaryContactPhone,
-    address,
-    lat,
-    lng,
-    capacity,
-    educationalMethod,
-    educationLevelMin,
-    educationLevelMax,
-    primaryEducationalLanguage,
-    secondaryEducationalLanguage,
-    tuition,
-  } = req.body;
-  const location = {
-    type: "Point",
-    coordinates: [lng, lat],
-  };
+
   const user = await User.findById(_id);
   if (user._schools.includes(schoolId)) {
     const school = await School.findByIdAndUpdate(
       schoolId,
-      {
-        name,
-        generalInfo,
-        primaryContactName,
-        primaryContactEmail,
-        primaryContactPhone,
-        address,
-        location,
-        capacity,
-        educationalMethod,
-        educationLevelMin,
-        educationLevelMax,
-        primaryEducationalLanguage,
-        secondaryEducationalLanguage,
-        tuition,
-      },
+      req.body,
       { new: true }
     );
 

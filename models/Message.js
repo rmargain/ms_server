@@ -6,11 +6,21 @@ const messageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    onToModel: {
+      type: String,
+      enum: ['User', 'School']
+    },
+    onFromModel: {
+      type: String,
+      enum: ['User', 'School']
+    },
     to: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        refPath: 'onToModel'
     },
     from: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        refPath: 'onFromModel'
     },
     text: {
       type: String,
