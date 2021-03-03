@@ -12,19 +12,15 @@ const studentSchema = new Schema(
     },
     level: {
       type: Number,
-      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     },
     avatar: {
       type: String,
     },
-    _applications: {
+    _applications: [{
       type: Schema.Types.ObjectId,
-      ref: "StudentApplications",
-    },
-    _enrollments: {
-      type: Schema.Types.ObjectId,
-      ref: "StudentApplicaitons",
-    },
+      ref: "StudentApplication",
+    }],
   },
   {
     timestamps: {

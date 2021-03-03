@@ -25,6 +25,8 @@ exports.createStudentApplication = async (req, res, next) => {
     _school: schoolId,
     _student: student._id
   });
+  student._applications.push(application._id)
+  await student.save()
   const school = await School.findById(schoolId);
   const msg = await Message.create({
     _user: _id,

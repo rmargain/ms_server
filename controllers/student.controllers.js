@@ -35,7 +35,30 @@ exports.getAllStudents = async (req, res, next) =>{
 exports.getStudentById = async (req, res, next) => {
     const {studentId} = req.params
     const student = await Student.findById(studentId)
+    .populate('_applications')
+    .populate({
+        path: '_applications',
+        populate: {
+            path: '_school',
+            select: 'name'}
+    })
+    
     res.status(201).json(student)
+}
+// get Students by user
+exports.getStudentsByUser = async (req, res, next) =>{
+    const {_id} = req.user
+    const students = await User.findById(_id)
+    // .populate('_students')
+    .populate({
+        path: '_students',
+        populate: {
+            path: '_applications',
+            model: 'StudentApplication'
+        }
+    })
+    const {_students} = students
+    res.status(201).json(_students)
 }
 
 

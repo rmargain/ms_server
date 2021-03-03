@@ -4,6 +4,7 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 const nodemailer = require("nodemailer");
+const { unsubscribe } = require("../routes/auth");
 let transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -23,7 +24,13 @@ const clearRes = (data) => {
 exports.loginProcess = (req, res, next) => {
   passport.authenticate("local", (error, user, errDetails) => {
     if (error) return res.status(500).json({ message: errDetails });
-    if (!user) return res.status(401).json({ message: "Unauthorized" });
+    if (!user || user.status === "Inactive")
+      return res
+        .status(401)
+        .json({
+          message:
+            "Unauthorized. If you have already created your account, check your email to confirm your account.",
+        });
 
     req.login(user, (error) => {
       if (error) return res.status(500).json({ message: errDetails });
@@ -75,19 +82,19 @@ exports.signupProcess = async (req, res) => {
           _doc: { password, ...rest },
         } = newUser;
       })
-      .then(() =>{
-          transporter.sendMail({
-            from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
-            to: email,
-            subject: "MicroSchooling: Activate your account",
-            html: `<b>click this link to activate your account: <a href="http://localhost:3001/auth/confirm/${token}"> click here </a>  </b>`,
-          });
+      .then(() => {
+        transporter.sendMail({
+          from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
+          to: email,
+          subject: "MicroSchooling: Activate your account",
+          html: `<b>click this link to activate your account: <a href="http://localhost:3000/confirm/${token}"> click here </a>  </b>`,
+        });
       })
-      //TODO: 
+      //TODO:
       //Change email link when deployed
       //Beautify email
       .then(() => {
-          res.status(200).json({ message: "confirmation email sent", newUser });
+        res.status(200).json({ message: "confirmation email sent", newUser });
       })
       .catch((err) => {
         console.log(err);
@@ -125,12 +132,14 @@ exports.changeAvatar = async (req, res) => {
   res.status(200).json(rest);
 };
 
-exports.confirmationProcess = async (req, res) => {
+exports.confirmationProcess = async (req, res, next) => {
   const { confirmationCode } = req.params;
-  await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { confirmationCode: confirmationCode },
     { status: "Active" },
     { new: true }
-  )
-  res.status(200).json({ message: "activation success" })
+  );
+
+  const usr = clearRes(user.toObject());
+  res.status(200).json(usr);
 };

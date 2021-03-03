@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { isAuth, catchErrors, isArtists } = require("../middlewares");
+const { isAuth, catchErrors } = require("../middlewares");
 const {
   createSchool,
   updateSchoolInfo,
@@ -10,6 +10,7 @@ const {
   deleteSchool,
   getSchoolsByUser,
   getStudentsBySchool,
+  uploadProcess
 } = require("../controllers/school.controllers");
 const {
   getAllStudents,
@@ -17,6 +18,7 @@ const {
   getStudentById,
   updateStudent,
   deleteStudent,
+  getStudentsByUser,
 } = require("../controllers/student.controllers");
 const {
   createStudentApplication,
@@ -48,19 +50,18 @@ router.get("/school/all", catchErrors(getAllSchools));
 router.get("/school", catchErrors(getSchoolsByUser));
 router.get("/school/search", catchErrors(getAllFilteredSchools));
 router.get("/school/:schoolId", catchErrors(getSchool));
-router.get(
-  "/school/:schoolId/students",
-  isAuth,
-  catchErrors(getStudentsBySchool)
-);
+router.get("/school/:schoolId/students", isAuth, catchErrors(getStudentsBySchool));
 router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
+router.post('/school/upload', uploader.single('image'), catcherrors(uploadProcess))
 
 // // ===========Student===========
-router.get("/student", catchErrors(getAllStudents));
+// router.get("/student", catchErrors(getAllStudents));
 router.post("/student/create", isAuth, catchErrors(createStudent));
 router.get("/student/:studentId", catchErrors(getStudentById));
 router.patch("/student/:studentId", isAuth, catchErrors(updateStudent));
 router.delete("/student/:studentId", isAuth, catchErrors(deleteStudent));
+router.get("/student", isAuth, catchErrors(getStudentsByUser))
+
 
 // //===========Student Applications===========
 router.post(

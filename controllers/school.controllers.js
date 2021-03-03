@@ -128,7 +128,7 @@ exports.getStudentsBySchool = async (req, res, next) => {
   const {_id} = req.user
   const user = await User.findById(_id)
   if(user.schools.includes(schoolId)){
-  const school = await (await School.findById(schoolId)).populate("_students")
+  const school = await School.findById(schoolId).populate("_students")
   const {_students} = school
   res.status(201).json({_students})
   } else {
@@ -143,3 +143,22 @@ exports.getAllLocations = async (req, res) => {
 exports.getOneLocation = async (req, res) => {
   
 }
+
+exports.uploadProcess = async (req, res) => {
+  const imgPath = req.file.path;
+  const { _id } = req.user;
+
+  if (!_id) {
+    return res.status(400).json({
+      message: "Invalalid operation",
+    });
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    { image: imgPath },
+    { new: true }
+  );
+
+  res.status(201).json(updatedUser);
+};
