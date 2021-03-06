@@ -12,7 +12,6 @@ exports.createSchool = async (req, res, next) => {
     address, /*cambiar por individuales*/
     lat,
     lng,
-    capacity,
     educationalMethod,
     educationLevelMin,
     educationLevelMax,
@@ -35,7 +34,6 @@ exports.createSchool = async (req, res, next) => {
     primaryContactPhone,
     address,
     location,
-    capacity,
     educationalMethod,
     educationLevelMin,
     educationLevelMax,
@@ -145,20 +143,21 @@ exports.getOneLocation = async (req, res) => {
 }
 
 exports.uploadProcess = async (req, res) => {
+  console.log(req.file.path)
   const imgPath = req.file.path;
-  const { _id } = req.user;
+  const { schoolId } = req.params;
+  console.log()
 
-  if (!_id) {
+  if (!schoolId) {
     return res.status(400).json({
       message: "Invalalid operation",
     });
   }
 
-  const updatedUser = await User.findByIdAndUpdate(
-    _id,
-    { image: imgPath },
-    { new: true }
-  );
+  const updatedSchool = await School.findById(schoolId)
+  updatedSchool.images.push(imgPath)
+  await updatedSchool.save()
+   
 
-  res.status(201).json(updatedUser);
+  res.status(201).json(updatedSchool);
 };

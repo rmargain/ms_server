@@ -22,12 +22,7 @@ const schoolSchema = new Schema(
       required: true,
     },
     primaryContactPhone: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return /\d{2}-\d{3}-\d{3}-\d{4}/.test(v);
-        },
-      },
+      type: String
     },
     address: {
       street: {
@@ -40,14 +35,11 @@ const schoolSchema = new Schema(
       intNum: {
         type: String,
       },
-      neighborhood: {
-        type: String,
-        require: true,
-      },
-      municipality: {
-        type: String,
-      },
       city: {
+        type: String,
+        require: true
+      },
+      region: {
         type: String,
         require: true,
       },
@@ -65,13 +57,9 @@ const schoolSchema = new Schema(
       type: {type: String},
       coordinates: [Number]
     },
-    capacity: {
-      type: Number,
-      required: true,
-    },
     educationalMethod: {
       type: String,
-      enum: ["Montessori", "Progressive", "Traditional", "Other"],
+      enum: ["Montessori", "Waldorf", "Self-directed", "Reggio Emilia", "Other"],
       required: true,
     },
     educationLevelMin: {
@@ -139,7 +127,11 @@ const schoolSchema = new Schema(
         ref: "Message"
       }
     ],
-    image: String,
+    images: [
+      {
+      type: String,
+    }
+  ]
   },
   {
     timestamps: {

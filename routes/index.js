@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const uploader = require("../config/cloudinary/cloudinary");
 const { isAuth, catchErrors } = require("../middlewares");
 const {
   createSchool,
@@ -52,7 +53,7 @@ router.get("/school/search", catchErrors(getAllFilteredSchools));
 router.get("/school/:schoolId", catchErrors(getSchool));
 router.get("/school/:schoolId/students", isAuth, catchErrors(getStudentsBySchool));
 router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
-router.post('/school/upload', uploader.single('image'), catcherrors(uploadProcess))
+router.post('/school/upload/:schoolId', uploader.single('image'), catchErrors(uploadProcess))
 
 // // ===========Student===========
 // router.get("/student", catchErrors(getAllStudents));
