@@ -143,10 +143,9 @@ exports.getOneLocation = async (req, res) => {
 }
 
 exports.uploadProcess = async (req, res) => {
-  console.log(req.file.path)
   const imgPath = req.file.path;
   const { schoolId } = req.params;
-  console.log()
+ 
 
   if (!schoolId) {
     return res.status(400).json({
@@ -161,3 +160,23 @@ exports.uploadProcess = async (req, res) => {
 
   res.status(201).json(updatedSchool);
 };
+
+exports.deleteImage = async (req, res) =>{
+  const {schoolId} = req.params;
+  const {image} = req.body;
+  const {_id} = req.user;
+
+  console.log(req.body)
+
+  const school = await School.findById(schoolId)
+  const user = await User.findById(_id)
+  if (user._schools.includes(schoolId)) {
+    const index = school.images.indexOf(image);
+    school.images.splice(index, 1);
+    await school.save();
+  }
+  
+
+  res.status(201).json(school)
+
+}

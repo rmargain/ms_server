@@ -113,7 +113,6 @@ const schoolSchema = new Schema(
     },
     tuition: {
       type: Number,
-      required: true,
     },
     _students: [
       {

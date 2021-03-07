@@ -11,7 +11,8 @@ const {
   deleteSchool,
   getSchoolsByUser,
   getStudentsBySchool,
-  uploadProcess
+  uploadProcess,
+  deleteImage
 } = require("../controllers/school.controllers");
 const {
   getAllStudents,
@@ -54,6 +55,7 @@ router.get("/school/:schoolId", catchErrors(getSchool));
 router.get("/school/:schoolId/students", isAuth, catchErrors(getStudentsBySchool));
 router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
 router.post('/school/upload/:schoolId', uploader.single('image'), catchErrors(uploadProcess))
+router.patch("/school/delete/:schoolId", isAuth, catchErrors(deleteImage))
 
 // // ===========Student===========
 // router.get("/student", catchErrors(getAllStudents));
