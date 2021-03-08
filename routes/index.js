@@ -30,6 +30,7 @@ const {
   getStudentApplicaitonById,
   cancelApplication,
   approveApplication,
+  getSchoolUserApplications
 } = require("../controllers/studentApplication.controllers");
 const {
   createMessage,
@@ -72,7 +73,7 @@ router.post(
   isAuth,
   catchErrors(createStudentApplication)
 );
-router.get("/application", isAuth, catchErrors(getAllStudentApplications));
+router.get("/application", isAuth, catchErrors(getSchoolUserApplications));
 router.get(
   "/application/:applicationId",
   isAuth,
@@ -98,6 +99,7 @@ router.patch(
   isAuth,
   catchErrors(cancelApplication)
 );
+
 // //===========Messages=========== TODO: Terminar Mensajes.
 
 router.post(

@@ -53,16 +53,52 @@ exports.createSchool = async (req, res, next) => {
 exports.updateSchoolInfo = async (req, res, next) => {
   const { _id } = req.user;
   const { schoolId } = req.params;
+  console.log(req.body)
 
   const user = await User.findById(_id);
   if (user._schools.includes(schoolId)) {
+    const {
+    name,
+    generalInfo,
+    primaryContactName,
+    primaryContactEmail,
+    primaryContactPhone,
+    address,
+    lat,
+    lng,
+    educationalMethod,
+    educationLevelMin,
+    educationLevelMax,
+    primaryEducationalLanguage,
+    secondaryEducationalLanguage,
+    tuition,
+  } = req.body;
+  const location = {
+    type: 'Point',
+    coordinates: [lng, lat]
+  }
+  const bod = {
+    name,
+    generalInfo,
+    primaryContactName,
+    primaryContactEmail,
+    primaryContactPhone,
+    address,
+    location,
+    educationalMethod,
+    educationLevelMin,
+    educationLevelMax,
+    primaryEducationalLanguage,
+    secondaryEducationalLanguage,
+    tuition,
+  }
     const school = await School.findByIdAndUpdate(
       schoolId,
-      req.body,
+      bod,
       { new: true }
     );
 
-    res.status(200).json(school);
+    res.status(200).json({school});
   } else {
     res.status(401).json({ message: "Unathorized" });
   }
@@ -71,7 +107,7 @@ exports.updateSchoolInfo = async (req, res, next) => {
 // Controlador para obtener todas las escuelas
 exports.getSchoolsByUser = async (req, res) => {
   const {_id} = req.user
-  const schools = await School.find({_user: _id});
+  const schools = await School.find({_user: _id}).populate('_schools');
   res.status(200).json({ schools });
 };
 

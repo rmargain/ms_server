@@ -61,6 +61,18 @@ exports.getAllStudentApplications = async (req, res, next) => {
   res.status(201).json(applications);
 };
 
+// get all applications for all schools of a user
+exports.getSchoolUserApplications = async (req, res, next) => {
+  const {_id} = req.user
+  const user= await User.findById(_id)
+  const {_schools} = user
+  const applications = await StudentApplication.find({_school: {$in: _schools}})
+  .populate('_school')
+  .populate('student')
+  .populate('_messages')
+  res.status(201).json({applications})
+}
+
 //controller for getting applications by applicationID
 exports.getStudentApplicaitonById = async (req, res, next) => {
   const { applicationId } = req.params;
@@ -122,7 +134,7 @@ exports.cancelApplication = async (req, res, next) => {
   }
 };
 
-// controller para cancelar applicación
+// controller para aprobar applicación
 exports.approveApplication = async (req, res, next) => {
   const { applicationId } = req.params;
   const { _id } = req.user;

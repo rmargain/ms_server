@@ -17,7 +17,7 @@ const studentApplicationSchema = new Schema(
     _messages: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Messages"
+        ref: "Message"
       }
     ],
     admitted: {
