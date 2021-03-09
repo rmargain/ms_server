@@ -12,8 +12,10 @@ const flash      = require("connect-flash");
 const cors = require("cors")
     
 
+const database = process.env.NODE_ENV === 'development' ? 'mongodb://localhost/ms-server' : process.env.DB
+
 mongoose
-  .connect('mongodb://localhost/ms-server', {useNewUrlParser: true})
+  .connect(database, {useNewUrlParser: true})
   .then(x => {
     console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
   })
@@ -33,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3001"],
     credentials: true,
   })
 );
@@ -55,6 +57,10 @@ app.use('/', index);
 
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
+
+app.use("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
       
 
 module.exports = app;

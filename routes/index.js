@@ -43,9 +43,9 @@ const {
 } = require("../controllers/message.controllers");
 
 /* GET home page */
-router.get("/", (req, res, next) => {
-  res.send("MS API");
-});
+// router.get("/", (req, res, next) => {
+//   res.send("MS API");
+// });
 
 // // ============School============                             👇
 router.post("/school/create", isAuth, catchErrors(createSchool));
