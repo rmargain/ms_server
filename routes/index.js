@@ -25,12 +25,13 @@ const {
 const {
   createStudentApplication,
   getAllStudentApplications,
-  getStudentApplicaitonsBySchool,
-  getStudentApplicaitonsByStudent,
-  getStudentApplicaitonById,
+  getStudentApplicationsBySchool,
+  getStudentApplicationsByStudent,
+  getStudentApplicationById,
   cancelApplication,
   approveApplication,
-  getSchoolUserApplications
+  getSchoolUserApplications,
+  getAllUserApplications
 } = require("../controllers/studentApplication.controllers");
 const {
   createMessage,
@@ -77,17 +78,22 @@ router.get("/application", isAuth, catchErrors(getSchoolUserApplications));
 router.get(
   "/application/:applicationId",
   isAuth,
-  catchErrors(getStudentApplicaitonById)
+  catchErrors(getStudentApplicationById)
+);
+router.get(
+  "/application/user/:userId",
+  isAuth,
+  catchErrors(getAllUserApplications)
 );
 router.get(
   "/application/school/:schoolId",
   isAuth,
-  catchErrors(getStudentApplicaitonsBySchool)
+  catchErrors(getStudentApplicationsBySchool)
 );
 router.get(
   "/application/student/:studentId",
   isAuth,
-  catchErrors(getStudentApplicaitonsByStudent)
+  catchErrors(getStudentApplicationsByStudent)
 );
 router.patch(
   "/application/approve/:applicationId",

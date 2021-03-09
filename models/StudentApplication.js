@@ -23,7 +23,7 @@ const studentApplicationSchema = new Schema(
     admitted: {
       type: String,
       default: 'Under Review',
-      enum: ['Approved', 'Under Review', 'Not Approved']
+      enum: ['Approved', 'Under Review', 'Not Approved', 'Cancelled']
     },
     enrolled: {
       type: Boolean,

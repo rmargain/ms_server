@@ -61,36 +61,121 @@ exports.getAllStudentApplications = async (req, res, next) => {
   res.status(201).json(applications);
 };
 
+// controller for getting all applications of all students of a user
+exports.getAllUserApplications = async (req, res, next) => {
+  const {_id} = req.user
+  const applications = await StudentApplication.find({ _user: _id })
+    .populate("_school", "name")
+    .populate("_user", { name: 1, lastname: 1 })
+    .populate("_student", "alias")
+    .populate({
+      path: "_messages",
+      populate: [
+        {
+          path: "to",
+          select: { name: 1, lastname: 1 },
+        },
+        {
+          path: "from",
+          select: { name: 1, lastname: 1 },
+        },
+      ],
+    });
+  res.status(201).json(applications);
+};
+
+
 // get all applications for all schools of a user
 exports.getSchoolUserApplications = async (req, res, next) => {
   const {_id} = req.user
   const user= await User.findById(_id)
   const {_schools} = user
-  const applications = await StudentApplication.find({_school: {$in: _schools}})
-  .populate('_school')
-  .populate('student')
-  .populate('_messages')
+  const applications = await StudentApplication.find({
+    _school: { $in: _schools },
+  })
+    .populate("_school", "name")
+    .populate("_user", { name: 1, lastname: 1 })
+    .populate("_student", "alias")
+    .populate({
+      path: "_messages",
+      populate: [
+        {
+          path: "to",
+          select: { name: 1, lastname: 1 },
+        },
+        {
+          path: "from",
+          select: { name: 1, lastname: 1 },
+        },
+      ],
+    });
   res.status(201).json({applications})
 }
 
 //controller for getting applications by applicationID
-exports.getStudentApplicaitonById = async (req, res, next) => {
+exports.getStudentApplicationById = async (req, res, next) => {
   const { applicationId } = req.params;
-  const application = await StudentApplication.findById(applicationId);
+  const application = await StudentApplication.findById(applicationId)
+    .populate("_school", "name")
+    .populate("_user", { name: 1, lastname: 1 })
+    .populate("_student", "alias")
+    .populate({
+      path: "_messages",
+      populate: [{
+        path: "to",
+        select: { name: 1, lastname: 1 },
+      },
+      {
+        path: "from",
+        select: { name: 1, lastname: 1 },
+      },]
+    });
   res.status(201).json(application);
 };
 
 //controller for getting applications by studentID
-exports.getStudentApplicaitonsByStudent = async (req, res, next) => {
+exports.getStudentApplicationsByStudent = async (req, res, next) => {
   const { studentId } = req.params;
-  const applications = await StudentApplication.find({ _student: studentId }).populate('_user').populate('_school').populate('_student');
+  const applications = await StudentApplication.find({ _student: studentId })
+    .populate("_school", "name")
+    .populate("_user", { name: 1, lastname: 1 })
+    .populate("_student", "alias")
+    .populate({
+      path: "_messages",
+      populate: [
+        {
+          path: "to",
+          select: { name: 1, lastname: 1 },
+        },
+        {
+          path: "from",
+          select: { name: 1, lastname: 1 },
+        },
+      ],
+    });
   res.status(201).json(applications);
 };
 
 //controller for getting applications by school by ID
-exports.getStudentApplicaitonsBySchool = async (req, res, next) => {
+exports.getStudentApplicationsBySchool = async (req, res, next) => {
   const { schoolId } = req.params;
-  const applications = await StudentApplication.find({ _school: schoolId });
+  const applications = await StudentApplication.find({ _school: schoolId })
+    .populate("_school", "name")
+    .populate("_user", { name: 1, lastname: 1 })
+    .populate("_student", "alias")
+    .populate({
+      path: "_messages",
+      populate: [
+        {
+          path: "to",
+          select: { name: 1, lastname: 1 },
+        },
+        {
+          path: "from",
+          select: { name: 1, lastname: 1 },
+        },
+      ],
+    });
   res.status(201).json(applications);
 };
 
@@ -113,7 +198,8 @@ exports.cancelApplication = async (req, res, next) => {
       text: message,
       _application: application._id,
     });
-    application.isCancelled = true,
+    application.isCancelled = true
+    application.admitted = "Cancelled"
     application._messages.push(msg._id)
     await application.save()
     school._messages.push(msg._id);
