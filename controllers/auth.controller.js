@@ -87,7 +87,7 @@ exports.signupProcess = async (req, res) => {
           from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
           to: email,
           subject: "MicroSchooling: Activate your account",
-          html: `<b>click this link to activate your account: <a href="http://localhost:3000/confirm/${token}"> click here </a>  </b>`,
+          html: `<b>click this link to activate your account: <a href="https://schoolmatch.herokuapp.com/confirm/${token}"> click here </a>  </b>`,
         });
       })
       //TODO:

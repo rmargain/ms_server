@@ -43,11 +43,11 @@ const {
 } = require("../controllers/message.controllers");
 
 /* GET home page */
-// router.get("/", (req, res, next) => {
-//   res.send("MS API");
-// });
+router.get("/", (req, res, next) => {
+  res.send('index')
+});
 
-// // ============School============                             👇
+// // ============School============                             
 router.post("/school/create", isAuth, catchErrors(createSchool));
 router.patch("/school/update/:schoolId", isAuth, catchErrors(updateSchoolInfo));
 router.get("/school/all", catchErrors(getAllSchools));

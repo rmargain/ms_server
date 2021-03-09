@@ -12,15 +12,16 @@ const flash      = require("connect-flash");
 const cors = require("cors")
     
 
-const database = process.env.NODE_ENV === 'development' ? 'mongodb://localhost/ms-server' : process.env.DB
 
 mongoose
-  .connect(database, {useNewUrlParser: true})
-  .then(x => {
-    console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
+  .connect(process.env.DB, { useNewUrlParser: true })
+  .then((x) => {
+    console.log(
+      `Connected to Mongo! Database name: "${x.connections[0].name}"`
+    );
   })
-  .catch(err => {
-    console.error('Error connecting to mongo', err)
+  .catch((err) => {
+    console.error("Error connecting to mongo", err);
   });
 
 const app_name = require('./package.json').name;
@@ -29,16 +30,19 @@ const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.
 const app = express();
 
 // Middleware Setup
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3001"],
+    origin: ["http://localhost:3000", "https://schoolmatch.herokuapp.com/"],
     credentials: true,
   })
 );
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 
 // Enable authentication using session + passport
@@ -53,10 +57,10 @@ require('./config/passport')(app);
     
 
 const index = require('./routes/index');
-app.use('/', index);
+app.use('/api', index);
 
 const authRoutes = require('./routes/auth');
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
