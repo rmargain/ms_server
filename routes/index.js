@@ -12,7 +12,7 @@ const {
   getSchoolsByUser,
   getStudentsBySchool,
   uploadProcess,
-  deleteImage
+  deleteImage,
 } = require("../controllers/school.controllers");
 const {
   getAllStudents,
@@ -31,7 +31,7 @@ const {
   cancelApplication,
   approveApplication,
   getSchoolUserApplications,
-  getAllUserApplications
+  getAllUserApplications,
 } = require("../controllers/studentApplication.controllers");
 const {
   createMessage,
@@ -39,25 +39,34 @@ const {
   deleteMessage,
   getMessagesBySchool,
   getMessagesByApplicant,
-  getMessagesByApplication
+  getMessagesByApplication,
+  recoverMessage,
 } = require("../controllers/message.controllers");
 
 /* GET home page */
 router.get("/", (req, res, next) => {
-  res.send('index')
+  res.send("index");
 });
 
-// // ============School============                             
+// // ============School============
 router.post("/school/create", isAuth, catchErrors(createSchool));
 router.patch("/school/update/:schoolId", isAuth, catchErrors(updateSchoolInfo));
 router.get("/school/all", catchErrors(getAllSchools));
 router.get("/school", catchErrors(getSchoolsByUser));
 router.get("/school/search", catchErrors(getAllFilteredSchools));
 router.get("/school/:schoolId", catchErrors(getSchool));
-router.get("/school/:schoolId/students", isAuth, catchErrors(getStudentsBySchool));
+router.get(
+  "/school/:schoolId/students",
+  isAuth,
+  catchErrors(getStudentsBySchool)
+);
 router.delete("/school/:schoolId", isAuth, catchErrors(deleteSchool));
-router.post('/school/upload/:schoolId', uploader.single('image'), catchErrors(uploadProcess))
-router.patch("/school/delete/:schoolId", isAuth, catchErrors(deleteImage))
+router.post(
+  "/school/upload/:schoolId",
+  uploader.single("image"),
+  catchErrors(uploadProcess)
+);
+router.patch("/school/delete/:schoolId", isAuth, catchErrors(deleteImage));
 
 // // ===========Student===========
 // router.get("/student", catchErrors(getAllStudents));
@@ -65,8 +74,7 @@ router.post("/student/create", isAuth, catchErrors(createStudent));
 router.get("/student/:studentId", catchErrors(getStudentById));
 router.patch("/student/:studentId", isAuth, catchErrors(updateStudent));
 router.delete("/student/:studentId", isAuth, catchErrors(deleteStudent));
-router.get("/student", isAuth, catchErrors(getStudentsByUser))
-
+router.get("/student", isAuth, catchErrors(getStudentsByUser));
 
 // //===========Student Applications===========
 router.post(
@@ -114,7 +122,12 @@ router.post(
   catchErrors(createMessage)
 );
 router.patch("/message/read/:messageId", isAuth, catchErrors(markAsRead));
-router.delete("/message/delete/:messageId", isAuth, catchErrors(deleteMessage));
+router.patch("/message/delete/:messageId", isAuth, catchErrors(deleteMessage));
+router.patch(
+  "/message/recover/:messageId",
+  isAuth,
+  catchErrors(recoverMessage)
+);
 router.get(
   "/message/school/:schoolId",
   isAuth,
@@ -126,6 +139,5 @@ router.get(
   isAuth,
   catchErrors(getMessagesByApplication)
 );
-// get by application
 
 module.exports = router;

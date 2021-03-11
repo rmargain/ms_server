@@ -4,7 +4,6 @@ const Student = require("../models/Student");
 const StudentApplication = require("../models/StudentApplication");
 const Message = require("../models/Message");
 const nodemailer = require("nodemailer");
-const { findById } = require("../models/User");
 let transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -30,6 +29,8 @@ exports.createMessage = async (req, res, next) => {
       from: application._user,
       text: message,
       _application: applicationId,
+      toDeleted: false,
+      fromDeleted: false,
     });
     application._messages.push(msg._id);
     await application.save();
@@ -39,7 +40,6 @@ exports.createMessage = async (req, res, next) => {
     school._messages.push(msg._id);
     await school.save();
     const { primaryContactEmail } = school;
-    console.log(primaryContactEmail);
     await transporter.sendMail({
       from: '"MicroSchooling" <r.margain.gonzalez@gmail.com>',
       to: primaryContactEmail,
@@ -57,6 +57,8 @@ exports.createMessage = async (req, res, next) => {
       from: application._school,
       text: message,
       _application: applicationId,
+      toDeleted: false,
+      fromDeleted: false,
     });
     application._messages.push(msg2._id);
     await application.save();
@@ -82,8 +84,9 @@ exports.markAsRead = async (req, res, next) => {
   const { messageId } = req.params;
   const { _id } = req.user;
   const message = await Message.findById(messageId);
-  console.log(message);
-  if (message.to === _id) {
+  const id = JSON.stringify(_id);
+  const to = JSON.stringify(message.to);
+  if (to === id) {
     message.status = "Read";
     message.save();
     res.status(201).json(message);
@@ -95,10 +98,14 @@ exports.markAsRead = async (req, res, next) => {
 exports.getMessagesBySchool = async (req, res) => {
   const { schoolId } = req.params;
   const { _id } = req.user;
+  const user = await User.findById(_id);
   if (user._schools.includes(schoolId)) {
-    const messages = await (await School.findById(schoolId)).populated(
-      "_messages"
-    );
+    const messages = await Message.find({
+      $or: [{ from: schoolId }, { to: schoolId }],
+    })
+      .sort({ created_at: -1 })
+      .populate("to", ["name", "lastname"])
+      .populate("from", ["name", "lastname"]);
     res.status(201).json(messages);
   } else {
     res.status(401).json({ message: "Unathorized" });
@@ -107,51 +114,81 @@ exports.getMessagesBySchool = async (req, res) => {
 
 exports.getMessagesByApplicant = async (req, res) => {
   const { _id } = req.user;
-  const { _messages } = await User.findById(_id);
-  const messages = await Message.find({ _id: _messages })
+  const messages = await Message.find({
+    $or: [{ from: _id }, { to: _id }],
+  })
+    .sort({ created_at: -1 })
+    .populate("to", ["name", "lastname"])
+    .populate("from", ["name", "lastname"]);
+  res.status(201).json(messages);
+};
+
+
+exports.getMessagesByApplication = async (req, res) => {
+  const { applicationId } = req.params;
+  const messages = await Message.find({ _application: applicationId })
     .populate("to")
     .populate("from");
   res.status(201).json(messages);
 };
 
-exports.getMessagesBySchool = async (req, res) => {
-  const { schoolId } = req.params;
+exports.deleteMessage = async (req, res, next) => {
+  const { messageId } = req.params;
   const { _id } = req.user;
-  const { _messages } = await School.findById(schoolId);
   const user = await User.findById(_id);
-  if (user._schools.includes(schoolId)) {
-      const messages = await Message.find({ _id: _messages })
-        .populate("to")
-        .populate("from");
-    res.status(201).json(messages);
+  const { _schools } = user;
+  const message = await Message.findById(messageId);
+  const { to, from } = message;
+  const id = JSON.stringify(_id);
+  const from2 = JSON.stringify(from);
+  const to2 = JSON.stringify(to);
+  if (from2 === id) {
+    message.fromDeleted = true;
+    await message.save();
+    res.status(201).json({ message: "Message Deleted" });
+  } else if (to2 === id) {
+    message.toDeleted = true;
+    await message.save();
+    res.status(201).json({ message: "Message Deleted" });
+  } else if (_schools.includes(from2)) {
+    message.fromDeleted = true;
+    await message.save();
+    res.status(201).json({ message: "Message Deleted" });
+  } else if (_schools.includes(to2)) {
+    message.toDeleted = true;
+    await message.save();
+    res.status(201).json({ message: "Message Deleted" });
   } else {
-    res.status(401).json({ message: "Unathorized" });
+    res.status(500).json({ message: "something went wrong" });
   }
 };
 
-exports.getMessagesByApplication = async (req, res) => {
-  const { applicationId } = req.params;
-  const messages = await Message.find({ _application: applicationId })
-  .populate('to')
-  .populate('from');
-  res.status(201).json(messages);
+exports.recoverMessage = async (req, res, next) => {
+  const { messageId } = req.params;
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+  const { _schools } = user;
+  const message = await Message.findById(messageId);
+  const id = JSON.stringify(_id);
+  const from2 = JSON.stringify(from);
+  const to2 = JSON.stringify(to);
+  if (from2 === id) {
+    message.fromDeleted = false;
+    await message.save();
+    res.status(201).json({ message: "Message Recovered" });
+  } else if (to2 === id) {
+    message.toDeleted = false;
+    await message.save();
+    res.status(201).json({ message: "Message Recovered" });
+  } else if (_schools.includes(from2)) {
+    message.fromDeleted = false;
+    await message.save();
+    res.status(201).json({ message: "Message Recovered" });
+  } else if (_schools.includes(to2)) {
+    message.toDeleted = false;
+    await message.save();
+    res.status(201).json({ message: "Message Recovered" });
+  } else {
+    res.status(500).json({ message: "something went wrong" });
+  }
 };
-
-// TODO: si hay tiempo incluir el delete
-// exports.deleteMessage = async (req, res, next) => {
-//     const {messageId} = req.params
-//     const {_id} = req.user
-//     const application = await StudentApplication.find({_messages: messageId})
-//     const school = await School.findById(application._school)
-//     const message = await Message.findById(messageId)
-//     if(application._user === _id){
-//         const user = await User.findById(_user)
-//         const index = user._messages.indexOf(messageId)
-//         user._messages.splice(index, 1)
-//         await user.save()
-//         res.status(201).json({message: 'message deleted'})
-//     } else {
-//         res.status(401).json({message: 'Unathorized'})
-//     }
-
-// }

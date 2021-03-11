@@ -93,6 +93,7 @@ exports.getSchoolUserApplications = async (req, res, next) => {
   const applications = await StudentApplication.find({
     _school: { $in: _schools },
   })
+  .sort({created_at: -1})
     .populate("_school", "name")
     .populate("_user", { name: 1, lastname: 1 })
     .populate("_student", "alias")
@@ -108,7 +109,7 @@ exports.getSchoolUserApplications = async (req, res, next) => {
           select: { name: 1, lastname: 1 },
         },
       ],
-    });
+    })
   res.status(201).json({applications})
 }
 

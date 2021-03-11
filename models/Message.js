@@ -8,31 +8,39 @@ const messageSchema = new Schema(
     },
     onToModel: {
       type: String,
-      enum: ['User', 'School']
+      enum: ["User", "School"],
     },
     onFromModel: {
       type: String,
-      enum: ['User', 'School']
+      enum: ["User", "School"],
     },
     to: {
-        type: Schema.Types.ObjectId,
-        refPath: 'onToModel'
+      type: Schema.Types.ObjectId,
+      refPath: "onToModel",
     },
     from: {
-        type: Schema.Types.ObjectId,
-        refPath: 'onFromModel'
+      type: Schema.Types.ObjectId,
+      refPath: "onFromModel",
     },
     text: {
       type: String,
     },
     status: {
-        type: String,
-        enum: ['Read', 'Unread'],
-        default: 'Unread'
+      type: String,
+      enum: ["Read", "Unread"],
+      default: "Unread",
     },
     _application: {
       type: Schema.Types.ObjectId,
       ref: "StudentApplications",
+    },
+    toDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    fromDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
