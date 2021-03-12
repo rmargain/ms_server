@@ -86,7 +86,8 @@ exports.markAsRead = async (req, res, next) => {
   const message = await Message.findById(messageId);
   const id = JSON.stringify(_id);
   const to = JSON.stringify(message.to);
-  if (to === id) {
+  const {_schools} = await User.findById(_id)
+  if (to === id || _schools.includes(message.to)) {
     message.status = "Read";
     message.save();
     res.status(201).json(message);
@@ -102,6 +103,23 @@ exports.getMessagesBySchool = async (req, res) => {
   if (user._schools.includes(schoolId)) {
     const messages = await Message.find({
       $or: [{ from: schoolId }, { to: schoolId }],
+    })
+      .sort({ created_at: -1 })
+      .populate("to", ["name", "lastname"])
+      .populate("from", ["name", "lastname"]);
+    res.status(201).json(messages);
+  } else {
+    res.status(401).json({ message: "Unathorized" });
+  }
+};
+
+exports.getMessagesBySchoolUser = async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+  const {_schools} = user
+  if (_schools) {
+    const messages = await Message.find({
+      $or: [{ from: _schools }, { to: _schools}],
     })
       .sort({ created_at: -1 })
       .populate("to", ["name", "lastname"])
@@ -139,6 +157,8 @@ exports.deleteMessage = async (req, res, next) => {
   const { _schools } = user;
   const message = await Message.findById(messageId);
   const { to, from } = message;
+   console.log(_schools.includes(from));
+   console.log(from);
   const id = JSON.stringify(_id);
   const from2 = JSON.stringify(from);
   const to2 = JSON.stringify(to);
@@ -150,15 +170,18 @@ exports.deleteMessage = async (req, res, next) => {
     message.toDeleted = true;
     await message.save();
     res.status(201).json({ message: "Message Deleted" });
-  } else if (_schools.includes(from2)) {
+  } else if (_schools.includes(from)) {
     message.fromDeleted = true;
     await message.save();
     res.status(201).json({ message: "Message Deleted" });
-  } else if (_schools.includes(to2)) {
+  } else if (_schools.includes(to)) {
     message.toDeleted = true;
     await message.save();
     res.status(201).json({ message: "Message Deleted" });
   } else {
+    console.log(_schools);
+    console.log(from);
+    console.log(to);
     res.status(500).json({ message: "something went wrong" });
   }
 };
@@ -169,6 +192,9 @@ exports.recoverMessage = async (req, res, next) => {
   const user = await User.findById(_id);
   const { _schools } = user;
   const message = await Message.findById(messageId);
+  const { to, from } = message;
+    console.log(_schools);
+    console.log(from);
   const id = JSON.stringify(_id);
   const from2 = JSON.stringify(from);
   const to2 = JSON.stringify(to);
@@ -180,15 +206,18 @@ exports.recoverMessage = async (req, res, next) => {
     message.toDeleted = false;
     await message.save();
     res.status(201).json({ message: "Message Recovered" });
-  } else if (_schools.includes(from2)) {
+  } else if (_schools.includes(from)) {
     message.fromDeleted = false;
     await message.save();
     res.status(201).json({ message: "Message Recovered" });
-  } else if (_schools.includes(to2)) {
+  } else if (_schools.includes(to)) {
     message.toDeleted = false;
     await message.save();
     res.status(201).json({ message: "Message Recovered" });
   } else {
-    res.status(500).json({ message: "something went wrong" });
+    console.log(_schools)
+    console.log(from)
+    console.log(to)
+    res.status(300).json({ message: "something went wrong" });
   }
 };

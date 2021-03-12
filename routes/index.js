@@ -41,6 +41,7 @@ const {
   getMessagesByApplicant,
   getMessagesByApplication,
   recoverMessage,
+  getMessagesBySchoolUser,
 } = require("../controllers/message.controllers");
 
 /* GET home page */
@@ -132,6 +133,11 @@ router.get(
   "/message/school/:schoolId",
   isAuth,
   catchErrors(getMessagesBySchool)
+);
+router.get(
+  "/message/school-user",
+  isAuth,
+  catchErrors(getMessagesBySchoolUser)
 );
 router.get("/message/applicant", isAuth, catchErrors(getMessagesByApplicant));
 router.get(
