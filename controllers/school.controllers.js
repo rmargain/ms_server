@@ -53,7 +53,6 @@ exports.createSchool = async (req, res, next) => {
 exports.updateSchoolInfo = async (req, res, next) => {
   const { _id } = req.user;
   const { schoolId } = req.params;
-  console.log(req.body)
 
   const user = await User.findById(_id);
   if (user._schools.includes(schoolId)) {
@@ -117,7 +116,6 @@ exports.getAllSchools = async (req, res) => {
   res.status(200).json({ schools });
 };
 
-//TODO: Verificar como voy a pasar estos como props o body para hacer el filtrado
 // Controlador para filtrar escuelas
 exports.getAllFilteredSchools = async (req, res) => {
   const {
@@ -202,7 +200,6 @@ exports.deleteImage = async (req, res) =>{
   const {image} = req.body;
   const {_id} = req.user;
 
-  console.log(req.body)
 
   const school = await School.findById(schoolId)
   const user = await User.findById(_id)

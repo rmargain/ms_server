@@ -186,7 +186,6 @@ exports.cancelApplication = async (req, res, next) => {
   const { _id } = req.user;
   const { message } = req.body;
   const user = await User.findById(_id);
-  console.log(user._applications.includes(applicationId))
   if (user._applications.includes(applicationId)) {
     const application = await StudentApplication.findById(applicationId);
     const school = await School.findById(application._school);

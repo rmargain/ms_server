@@ -90,14 +90,10 @@ exports.signupProcess = async (req, res) => {
           html: `<b>click this link to activate your account: <a href="https://schoolmatch.herokuapp.com/confirm/${token}"> click here </a>  </b>`,
         });
       })
-      //TODO:
-      //Change email link when deployed
-      //Beautify email
       .then(() => {
         res.status(200).json({ message: "confirmation email sent", newUser });
       })
       .catch((err) => {
-        console.log(err);
         res.status(500).json({ message: err.message });
       });
   });

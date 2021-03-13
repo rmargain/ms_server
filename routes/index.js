@@ -115,7 +115,7 @@ router.patch(
   catchErrors(cancelApplication)
 );
 
-// //===========Messages=========== TODO: Terminar Mensajes.
+// //===========Messages=========== 
 
 router.post(
   "/message/create/:applicationId",

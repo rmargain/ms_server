@@ -157,8 +157,6 @@ exports.deleteMessage = async (req, res, next) => {
   const { _schools } = user;
   const message = await Message.findById(messageId);
   const { to, from } = message;
-   console.log(_schools.includes(from));
-   console.log(from);
   const id = JSON.stringify(_id);
   const from2 = JSON.stringify(from);
   const to2 = JSON.stringify(to);
@@ -179,9 +177,6 @@ exports.deleteMessage = async (req, res, next) => {
     await message.save();
     res.status(201).json({ message: "Message Deleted" });
   } else {
-    console.log(_schools);
-    console.log(from);
-    console.log(to);
     res.status(500).json({ message: "something went wrong" });
   }
 };
@@ -193,8 +188,6 @@ exports.recoverMessage = async (req, res, next) => {
   const { _schools } = user;
   const message = await Message.findById(messageId);
   const { to, from } = message;
-    console.log(_schools);
-    console.log(from);
   const id = JSON.stringify(_id);
   const from2 = JSON.stringify(from);
   const to2 = JSON.stringify(to);
@@ -215,9 +208,6 @@ exports.recoverMessage = async (req, res, next) => {
     await message.save();
     res.status(201).json({ message: "Message Recovered" });
   } else {
-    console.log(_schools)
-    console.log(from)
-    console.log(to)
     res.status(300).json({ message: "something went wrong" });
   }
 };
